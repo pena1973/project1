@@ -7,9 +7,9 @@ import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class MenuHelper
+class MenuHelper
 {
-    public static JMenuItem addMenuItem(JMenu parent, String text, ActionListener actionListener) {
+    private static JMenuItem addMenuItem(JMenu parent, String text, ActionListener actionListener) {
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(actionListener);
         parent.add(menuItem);
@@ -22,19 +22,29 @@ public class MenuHelper
         return menuItem;
     }
 
-    public static JMenuItem addMenuItem(JMenu parent, Action action) {
+    private static JMenuItem addMenuItem(JMenu parent, Action action) {
         JMenuItem menuItem = new JMenuItem(action);
         parent.add(menuItem);
         return menuItem;
     }
 
-    public static void initHelpMenu(View view, JMenuBar menuBar) {
+     static void initToolsMenu(View view, JMenuBar menuBar) {
+        JMenu helpMenu = new JMenu("Инструменты");
+        addMenuItem(helpMenu, "Закладка", view);
+        addMenuItem(helpMenu, "Новая глава", view);
+        menuBar.add(helpMenu);
+    }
+     static void initHelpMenu(View view, JMenuBar menuBar) {
         JMenu helpMenu = new JMenu("Помощь");
+        addMenuItem(helpMenu, "Ключ", view);
+        addMenuItem(helpMenu, "Настройки", view);
+        addMenuItem(helpMenu, "Язык интерфейса", view);
         menuBar.add(helpMenu);
         addMenuItem(helpMenu, "О программе", view);
+
     }
 
-    public static void initVocabularyMenu(View view, JMenuBar menuBar) {
+     static void initVocabularyMenu(View view, JMenuBar menuBar) {
         JMenu vocabularyMenu = new JMenu("Словарь");
         addMenuItem(vocabularyMenu, "Новый словарь", view);
         addMenuItem(vocabularyMenu, "Открыть словарь", view);
@@ -43,7 +53,7 @@ public class MenuHelper
         menuBar.add(vocabularyMenu);
     }
 
-    public static void initFileMenu(View view, JMenuBar menuBar) {
+     static void initFileMenu(View view, JMenuBar menuBar) {
         JMenu fileMenu = new JMenu("Файл");
         menuBar.add(fileMenu);
         addMenuItem(fileMenu, "Открыть файл", view);
