@@ -164,7 +164,7 @@ public class Controller
 
         else
         {
-            try (FileWriter writer = new FileWriter(currentFileVocabulary))
+            try (FileWriter writer = new FileWriter(new  File(currentFileVocabulary.toString()+".txt")))
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
             }
@@ -177,7 +177,7 @@ public class Controller
 
     public void saveVocabularuAs()
     {
-        String path = "output.xls";
+        String path = "vocabulary.txt";
 
         JFileChooser jFileChooser = new JFileChooser();
         MyFileFilter filter = new MyFileFilter();
@@ -186,7 +186,8 @@ public class Controller
         if (n == JFileChooser.APPROVE_OPTION)
         {
             currentFileVocabulary = jFileChooser.getSelectedFile();
-            try (FileWriter writer = new FileWriter(currentFileVocabulary))
+
+            try (FileWriter writer = new FileWriter(new  File(currentFileVocabulary.toString()+".txt")))
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
             }
