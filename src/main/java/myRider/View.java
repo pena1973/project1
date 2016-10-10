@@ -102,7 +102,7 @@ public class View extends JFrame implements ActionListener
             exit();
         } else if (commanda.equals("О программе"))
         {
-            //    showAbout();
+                showAbout();
         }
     }
 
@@ -114,18 +114,24 @@ public class View extends JFrame implements ActionListener
         setVisible(true);
     }
 
-    public void exit()
+      public void exit()
     {
         controller.exit();
     }
 
+    public void showAbout()
+    {
+        controller.showAbout();
+    }
 
     public void initMenuBar()
     {
         JMenuBar menuBar = new JMenuBar();
         MenuHelper.initFileMenu(this, menuBar);
         MenuHelper.initVocabularyMenu(this, menuBar);
+        MenuHelper.initToolsMenu(this, menuBar);
         MenuHelper.initHelpMenu(this, menuBar);
+
 
         getContentPane().add(menuBar, BorderLayout.NORTH);
     }
