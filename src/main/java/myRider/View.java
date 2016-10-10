@@ -39,6 +39,8 @@ public class View extends JFrame implements ActionListener
     private JPopupMenu popup = new JPopupMenu();
     private JSeparator divider = new JSeparator(SwingConstants.VERTICAL);// разделитель
 
+  //
+
     public View()
     {
         try
@@ -102,7 +104,11 @@ public class View extends JFrame implements ActionListener
             exit();
         } else if (commanda.equals("О программе"))
         {
-                showAbout();
+            showAbout();
+
+        } else if (commanda.equals("Настройки"))
+        {
+            showSettings();
         }
     }
 
@@ -114,14 +120,19 @@ public class View extends JFrame implements ActionListener
         setVisible(true);
     }
 
-      public void exit()
+    public void exit()
     {
         controller.exit();
     }
 
     public void showAbout()
     {
-        controller.showAbout();
+        JOptionPane.showMessageDialog(textPane, "Программа Мой ридер - мой первый самостоятельный проект", "О программе", JOptionPane.INFORMATION_MESSAGE);
+
+    }
+
+    public void showSettings(){
+        controller.showSettings();
     }
 
     public void initMenuBar()
@@ -222,11 +233,12 @@ public class View extends JFrame implements ActionListener
                 textPane.setSelectionEnd(ept);
                 wrd = textPane.getSelectedText();
 
-                ArrayList<String> listWords = controller.getWords(wrd,"en-ru");
+                ArrayList<String> listWords = controller.getWords(wrd, "en-ru");
                 popup.removeAll();
-                for (String s : listWords) {
+                for (String s : listWords)
+                {
                     JMenuItem item;
-                    popup.add( item = new JMenuItem(s));
+                    popup.add(item = new JMenuItem(s));
                     item.setHorizontalTextPosition(JMenuItem.RIGHT);
                     final String finalWrd = wrd;
                     item.addActionListener(new ActionListener()
@@ -235,7 +247,7 @@ public class View extends JFrame implements ActionListener
                         public void actionPerformed(ActionEvent e)
                         {
                             //System.out.println("actionPerformed");
-                            controller.addWord(finalWrd,e.getActionCommand().toString().trim());
+                            controller.addWord(finalWrd, e.getActionCommand().toString().trim());
                         }
                     });
 
@@ -247,6 +259,7 @@ public class View extends JFrame implements ActionListener
             e.printStackTrace();
         }
     }
+
     public void openMenu(MouseEvent event)
     {
         if (event.isPopupTrigger())

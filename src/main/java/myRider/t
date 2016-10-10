@@ -1,1 +1,21 @@
-Branch test 7
+Как поставить в нужное место курсор
+[22:52:06] Ян Вязовский: тогда еще вопрос
+путь к файлу считать проблемм нет
+а вот как сохранить положение курсора
+а потом его открыть в том же местеЕсли дело про положение курсора в файле, то полагаю тут поможет RandomAccesFile
+[22:55:10] Ян Вязовский: конкретно метод seek()
+[22:55:34] Ян Вязовский: и getFilePointer()
+
+
+Как изменить цвет определенного слова в документе
+http://stackoverflow.com/questions/14400946/how-to-change-the-color-of-specific-words-in-a-jtextpane
+
+
+Книга подготовки к экзамену на англитйском
+
+https://books.google.ca/books?id=nmSzBQAAQBAJ&printsec=frontcover&dq=OCA+Java+SE+8+Programmer+I+Study+Guide&hl=ru&sa=X&ved=0ahUKEwiSusug_9DPAhUP72MKHXKeAKkQ6AEIKjAA#v=onepage&q=OCA%20Java%20SE%208%20Programmer%20I%20Study%20Guide&f=false
+https://books.google.ca/books?id=bvYbCQAAQBAJ&pg=PA164&lpg=PA164&dq=map%3CString,+Double%3E+map+%3D+new+HashMap%3C%3E();+ocp&source=bl&ots=E14sdA7226&sig=NsoQm6K3eliXnNAL7hbWUDB70FQ&hl=ru&sa=X&ved=0ahUKEwjx56OvnczPAhUJwWMKHVVyCxkQ6AEIKDAB#v=onepage&q&f=false
+
+Формат конца строк
+
+http://www.webmancer.org/fatal-lf-would-be-replaced-by-crlf-in/

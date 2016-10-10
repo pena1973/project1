@@ -36,9 +36,9 @@ class MenuHelper
     }
      static void initHelpMenu(View view, JMenuBar menuBar) {
         JMenu helpMenu = new JMenu("Помощь");
-        addMenuItem(helpMenu, "Ключ", view);
+       // addMenuItem(helpMenu, "Ключ", view);
         addMenuItem(helpMenu, "Настройки", view);
-        addMenuItem(helpMenu, "Язык интерфейса", view);
+      //  addMenuItem(helpMenu, "Язык интерфейса", view);
         menuBar.add(helpMenu);
         addMenuItem(helpMenu, "О программе", view);
 

@@ -30,11 +30,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class Controller
 {
     private View view;
+    private Settings settings;
 
     private DefaultStyledDocument document;
     private DefaultStyledDocument documentVocabulary;
@@ -68,13 +70,41 @@ public class Controller
 
     public void exit()
     {
+
         System.exit(0);
         //Исходя из общепринятой практики и установленных стандартов код выхода равный 0 — сигнализирует об успешном выполнении задачи.
     }
 
-    public void showAbout(){
+    //  все методы настроек
+    public void showSettings()
+    {
+        settings.showDialog(this);
+    }
+
+    public void saveSettings(Map<String, String> map)
+    {
+        File file = new File("C:\\Project1\\property.txt");
+
+        try (PrintWriter out = new PrintWriter(file.getAbsoluteFile()))
+        {
+            if (!file.exists())
+            {
+                file.createNewFile();
+            }
+
+            //Записываем текст у файл
+            for (Map.Entry<String, String> e : map.entrySet())
+            {
+                out.println(e.getKey() + "=" + e.getValue());
+            }
+        }
+        catch (IOException e)
+        {
+            ExceptionHandler.log(e);
+        }
 
     }
+
     //  все методы текста
     public void resetDocument()
     {
@@ -167,7 +197,7 @@ public class Controller
 
         else
         {
-            try (FileWriter writer = new FileWriter(new  File(currentFileVocabulary.toString()+".txt")))
+            try (FileWriter writer = new FileWriter(new File(currentFileVocabulary.toString() + ".txt")))
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
             }
@@ -190,7 +220,7 @@ public class Controller
         {
             currentFileVocabulary = jFileChooser.getSelectedFile();
 
-            try (FileWriter writer = new FileWriter(new  File(currentFileVocabulary.toString()+".txt")))
+            try (FileWriter writer = new FileWriter(new File(currentFileVocabulary.toString() + ".txt")))
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
             }
@@ -311,11 +341,11 @@ public class Controller
     public void addWord(String translation, String wrd)
     {
 
-        String translate =  ((documentVocabulary.getLength()!=0)?"\n":"") +  translation + " - " + wrd;
+        String translate = ((documentVocabulary.getLength() != 0) ? "\n" : "") + translation + " - " + wrd;
 
         try
         {
-            documentVocabulary.replace(documentVocabulary.getLength(),0,translate,null);
+            documentVocabulary.replace(documentVocabulary.getLength(), 0, translate, null);
             view.updateVocabulary();
         }
         catch (BadLocationException e)
