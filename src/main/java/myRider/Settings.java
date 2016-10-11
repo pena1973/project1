@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class  Settings extends JDialog
+public class Settings extends JDialog
 {
     private static volatile Settings dialog = null; // потоков нет, но на будущее
 
@@ -70,18 +70,18 @@ public class  Settings extends JDialog
 
     private void onOK()
     {
-      //  userNameTextField.getText()
-        Map<String,String> map = new HashMap<>();
-        map.put("userName",userNameTextField.getText());
-        map.put("keyYandex",keyYandexTextField.getText());
-        map.put("showTips",showTipsCheckBox.isSelected()?"true":"false");
-        map.put("repeatWords",repeatWordsCheckBox.isSelected()?"true":"false");
-        map.put("fonts",fontsComboBox.getSelectedItem().toString());
-        map.put("size",sizeComboBox.getSelectedItem().toString());
-        map.put("bold",boldCheckBox.isSelected()?"true":"false");
-        map.put("italic",italicCheckBox.isSelected()?"true":"false");
+        //  userNameTextField.getText()
+        Map<String, String> map = new HashMap<>();
+        map.put("userName", userNameTextField.getText());
+        map.put("keyYandex", keyYandexTextField.getText());
+        map.put("showTips", showTipsCheckBox.isSelected() ? "true" : "false");
+        map.put("repeatWords", repeatWordsCheckBox.isSelected() ? "true" : "false");
+        map.put("fonts", fontsComboBox.getSelectedItem().toString());
+        map.put("size", sizeComboBox.getSelectedItem().toString());
+        map.put("bold", boldCheckBox.isSelected() ? "true" : "false");
+        map.put("italic", italicCheckBox.isSelected() ? "true" : "false");
         controller.saveSettings(map);
-
+        controller.setSettings(map);
         dispose();
     }
 
@@ -91,30 +91,42 @@ public class  Settings extends JDialog
         dispose();
     }
 
-//  псевдо конструктор, делаем диалог синглтоном и только тогда когда его вызвали.
-    public static Settings showDialog(Controller controller) {
-        if (dialog == null) {
-            synchronized (Settings.class) {
+    //  псевдо конструктор, делаем диалог синглтоном и только тогда когда его вызвали.
+    public static Settings showDialog(Controller controller)
+    {
+        if (dialog == null)
+        {
+            synchronized (Settings.class)
+            {
                 dialog = new Settings();
                 dialog.controller = controller;
+                dialog.setTitle("Настройки");
                 dialog.pack();
-                dialog.setVisible(true);
-                System.exit(0);
             }
         }
+
+        Map<String, String> map = controller.getSettings();
+        if (!map.isEmpty())
+        {
+            dialog.userNameTextField.setText(map.get("userName"));
+            dialog.keyYandexTextField.setText(map.get("keyYandex"));
+            dialog.showTipsCheckBox.setSelected(map.get("showTips").equals("true"));
+            dialog.repeatWordsCheckBox.setSelected(map.get("repeatWords").equals("true"));
+            dialog.fontsComboBox.setSelectedItem(map.get("fonts"));
+            dialog.sizeComboBox.setSelectedItem(map.get("size"));
+            dialog.boldCheckBox.setSelected(map.get("bold").equals("true"));
+            dialog.italicCheckBox.setSelected(map.get("italic").equals("true"));
+
+        }
+
+        dialog.setVisible(true);
         return dialog;
     }
 
     private void createUIComponents()
     {
-       // // TODO: place custom component creation code here
+        // // TODO: place custom component creation code here
     }
 
-//    public static void main(String[] args)
-//    {
-//        Settings dialog = new Settings();
-//        dialog.pack();
-//        dialog.setVisible(true);
-//        System.exit(0);
-//    }
+
 }

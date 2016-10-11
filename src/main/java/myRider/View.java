@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Map;
 
 
 public class View extends JFrame implements ActionListener
@@ -132,8 +133,16 @@ public class View extends JFrame implements ActionListener
     }
 
     public void showSettings(){
-        controller.showSettings();
+        controller.showDialogSettings();
     }
+
+    public void setSettings(){
+        Map<String, String> map = controller.getSettings();
+        if (map.isEmpty())
+            controller.setDefaultSettings();
+        else controller.setSettings(map);
+        }
+
 
     public void initMenuBar()
     {
@@ -192,9 +201,14 @@ public class View extends JFrame implements ActionListener
         initMenuBar();
         initEditor();
         pack();
+        controller.resetDocument();
+        controller.resetVocabulary();
+
         //Если вместо указания размеров окна, вызвать метод pack(),
         // они будут подобраны оптимальным образом с учетом
         // предпочтений всех элементов, размещенных в этом окне.
+
+
     }
 
     @Override
@@ -211,8 +225,8 @@ public class View extends JFrame implements ActionListener
     public void updateTxt()
     {
         textPane.setDocument(controller.getDocument());
-
     }
+
 
     public void updateVocabulary()
     {

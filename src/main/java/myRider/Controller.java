@@ -1,6 +1,7 @@
 package myRider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.javarush.test.level20.lesson02.task05.Solution;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -21,14 +22,13 @@ import org.jsoup.nodes.Element;
 
 
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyledEditorKit;
+import javax.swing.text.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,11 +38,15 @@ public class Controller
     private View view;
     private Settings settings;
 
-    private DefaultStyledDocument document;
+//    private DefaultStyledDocument document;
     private DefaultStyledDocument documentVocabulary;
+    private StyledDocument document;
+//    private StyledDocument documentVocabulary;
 
     private File currentFile;
     private File currentFileVocabulary;
+
+    private File propertyFile = new File("C:\\Project1\\property.txt");
 
     // соединение
     private static HttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
@@ -76,20 +80,20 @@ public class Controller
     }
 
     //  все методы настроек
-    public void showSettings()
+    public void showDialogSettings()
     {
         settings.showDialog(this);
     }
 
     public void saveSettings(Map<String, String> map)
     {
-        File file = new File("C:\\Project1\\property.txt");
+    //    File file = new File("C:\\Project1\\property.txt");
 
-        try (PrintWriter out = new PrintWriter(file.getAbsoluteFile()))
+        try (PrintWriter out = new PrintWriter(propertyFile.getAbsoluteFile()))
         {
-            if (!file.exists())
+            if (!propertyFile.exists())
             {
-                file.createNewFile();
+                propertyFile.createNewFile();
             }
 
             //Записываем текст у файл
@@ -105,11 +109,51 @@ public class Controller
 
     }
 
+    public Map<String, String> getSettings(){
+
+        Map<String, String> map = new HashMap<>();
+
+        try(BufferedReader reader = new BufferedReader (new FileReader(propertyFile)))
+        {
+            String c;
+            while ((c = reader.readLine())!=null){
+                String[] prop = c.split("=");
+                map.put(prop[0],prop.length >1?prop[1]:"");
+            }
+        }
+        catch(IOException e){
+
+        ExceptionHandler.log(e);
+        }
+        return map;
+    }
+
+    public void setSettings(Map<String, String> map){
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        document.addStyle("def", def);
+        // map.get("fonts")
+        //StyleConstants.setFontFamily(def, "Monospaced");
+        StyleConstants.setFontSize(def, Integer.parseInt(map.get("size")));
+        StyleConstants.setBold(def, map.get("bold").equals("true")?true:false);
+        StyleConstants.setItalic(def, map.get("italic").equals("true")?true:false);
+    }
+
+    public void setDefaultSettings(){
+
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        document.addStyle("def", def);
+        StyleConstants.setFontFamily(def, "Monospaced");
+        StyleConstants.setFontSize(def, 12);
+
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
     //  все методы текста
     public void resetDocument()
     {
         StyledEditorKit htmlKit = new StyledEditorKit();
         document = (DefaultStyledDocument) htmlKit.createDefaultDocument();
+        view.setSettings();
         view.updateTxt();
     }
 
@@ -125,6 +169,7 @@ public class Controller
             resetDocument();
             view.setTitle(currentFile.getName());
             StyledEditorKit htmlKit = new StyledEditorKit();
+
             try (FileReader reader = new FileReader(currentFile))
             {
                 htmlKit.read(reader, document, 0);
@@ -146,10 +191,12 @@ public class Controller
         resetDocument();
     }
 
-    public DefaultStyledDocument getDocument()
+    //public DefaultStyledDocument getDocument()
+    public StyledDocument getDocument()
     {
         return document;
     }
+////////////////////////////////////////////////////////////////////////////////////////////
 
     //  все методы словаря
     public void resetVocabulary()
@@ -233,10 +280,12 @@ public class Controller
         }
     }
 
-    public DefaultStyledDocument getVocabulary()
+    //public DefaultStyledDocument getVocabulary()
+    public StyledDocument getVocabulary()
     {
         return documentVocabulary;
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
     //  служебные процедуры и функции
     public ArrayList<String> getWords(String wrd, String direction)
@@ -356,4 +405,5 @@ public class Controller
         //System.out.println(translation + " - " + wrd);
     }
 
+////////////////////////////////////////////////////////////////////////////////////////////
 }

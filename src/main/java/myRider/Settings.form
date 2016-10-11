@@ -77,7 +77,7 @@
               </grid>
             </constraints>
             <properties>
-              <background color="-1638482"/>
+              <background color="-1"/>
               <columns value="0"/>
               <editable value="true"/>
               <enabled value="true"/>
@@ -169,7 +169,7 @@
       <component id="62da5" class="javax.swing.JCheckBox" binding="showTipsCheckBox">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false">
-            <preferred-size width="349" height="24"/>
+            <preferred-size width="358" height="24"/>
           </grid>
         </constraints>
         <properties>
@@ -178,7 +178,9 @@
       </component>
       <component id="81608" class="javax.swing.JCheckBox" binding="repeatWordsCheckBox">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="358" height="24"/>
+          </grid>
         </constraints>
         <properties>
           <text value="в новой главе записывать слова повторно"/>
