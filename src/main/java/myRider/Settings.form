@@ -115,10 +115,11 @@
             </constraints>
             <properties>
               <model>
-                <item value="Times New Roman"/>
-                <item value="Arial"/>
-                <item value="Castellar"/>
-                <item value="Sitka Text"/>
+                <item value="TimesRoman"/>
+                <item value="Helvetica"/>
+                <item value="Courier"/>
+                <item value="Dialog"/>
+                <item value="ZapfDingbats"/>
               </model>
             </properties>
           </component>

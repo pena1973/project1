@@ -81,7 +81,8 @@ public class Settings extends JDialog
         map.put("bold", boldCheckBox.isSelected() ? "true" : "false");
         map.put("italic", italicCheckBox.isSelected() ? "true" : "false");
         controller.saveSettings(map);
-        controller.setSettings(map);
+        controller.setSettings();
+        controller.initKey();
         dispose();
     }
 

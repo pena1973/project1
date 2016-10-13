@@ -37,6 +37,7 @@ public class Controller
 {
     private View view;
     private Settings settings;
+    private String key;
 
 //    private DefaultStyledDocument document;
     private DefaultStyledDocument documentVocabulary;
@@ -65,12 +66,21 @@ public class Controller
         view.setController(controller);
         view.init();
         controller.init();
+        controller.initKey();
     }
 
     public void init()
     {
         NewVocabulary();
+
     }
+
+    public void initKey()
+    {
+        Map<String,String> map = getSettings();
+        key = map.get("keyYandex");
+    }
+
 
     public void exit()
     {
@@ -127,25 +137,13 @@ public class Controller
         }
         return map;
     }
+    public void setSettings(){
 
-    public void setSettings(Map<String, String> map){
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-        document.addStyle("def", def);
-        // map.get("fonts")
-        //StyleConstants.setFontFamily(def, "Monospaced");
-        StyleConstants.setFontSize(def, Integer.parseInt(map.get("size")));
-        StyleConstants.setBold(def, map.get("bold").equals("true")?true:false);
-        StyleConstants.setItalic(def, map.get("italic").equals("true")?true:false);
-    }
-
-    public void setDefaultSettings(){
-
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-        document.addStyle("def", def);
-        StyleConstants.setFontFamily(def, "Monospaced");
-        StyleConstants.setFontSize(def, 12);
+        view.setSettings();
 
     }
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////
 
     //  все методы текста
@@ -329,8 +327,10 @@ public class Controller
 //            }
 
 
+
         String urlRequest = "https://translate.yandex.net/api/v1.5/tr.json/translate?"
-                + "key=trnsl.1.1.20160928T190600Z.7a199fa95d360255.bca499bd605822f36e9144bf0e334af8dfbb391e"
+//                + "key=trnsl.1.1.20160928T190600Z.7a199fa95d360255.bca499bd605822f36e9144bf0e334af8dfbb391e"
+                + "key="+key
                 + "&text=" + wrd.trim()
                 + "&lang=" + direction.trim();
         String responseString = "";

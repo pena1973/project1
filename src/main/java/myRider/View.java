@@ -40,7 +40,7 @@ public class View extends JFrame implements ActionListener
     private JPopupMenu popup = new JPopupMenu();
     private JSeparator divider = new JSeparator(SwingConstants.VERTICAL);// разделитель
 
-  //
+    //
 
     public View()
     {
@@ -132,16 +132,29 @@ public class View extends JFrame implements ActionListener
 
     }
 
-    public void showSettings(){
+    public void showSettings()
+    {
         controller.showDialogSettings();
     }
 
-    public void setSettings(){
+    public void setSettings()
+    {
         Map<String, String> map = controller.getSettings();
+
         if (map.isEmpty())
-            controller.setDefaultSettings();
-        else controller.setSettings(map);
+        {
+            textPane.setFont(new Font("TimesRoman", Font.PLAIN, 12));
+            vocabularyPane.setFont(new Font("TimesRoman", Font.PLAIN, 12));
+        } else
+        {
+            String font = map.get("fonts");
+            int style = (map.get("bold").equals("true") ? Font.BOLD : 0) + (map.get("italic").equals("true") ? Font.ITALIC : 0);
+            int size = Integer.parseInt(map.get("size"));
+
+            textPane.setFont(new Font(font, style, size));
+            vocabularyPane.setFont(new Font(font, style, size));
         }
+    }
 
 
     public void initMenuBar()
