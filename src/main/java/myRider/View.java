@@ -110,7 +110,16 @@ public class View extends JFrame implements ActionListener
         } else if (commanda.equals("Настройки"))
         {
             showSettings();
+
+        } else
+        {
+            String s = commanda.toString();
+            if (s.substring(s.length() - 1, s.length()).equals(" "))
+                controller.openDocument(s.trim());
+            else
+                controller.openVocabulary(s);
         }
+
     }
 
     public void init()
@@ -147,22 +156,25 @@ public class View extends JFrame implements ActionListener
             vocabularyPane.setFont(new Font("TimesRoman", Font.PLAIN, 12));
         } else
         {
+
             String font = map.get("fonts");
             int style = (map.get("bold").equals("true") ? Font.BOLD : 0) + (map.get("italic").equals("true") ? Font.ITALIC : 0);
             int size = Integer.parseInt(map.get("size"));
 
+
             textPane.setFont(new Font(font, style, size));
             vocabularyPane.setFont(new Font(font, style, size));
+
         }
     }
+
 
 
     public void initMenuBar()
     {
         JMenuBar menuBar = new JMenuBar();
-        MenuHelper.initFileMenu(this, menuBar);
-        MenuHelper.initVocabularyMenu(this, menuBar);
-        MenuHelper.initToolsMenu(this, menuBar);
+        MenuHelper.initFileMenu(this, menuBar, controller.getHistory());
+        MenuHelper.initVocabularyMenu(this, menuBar, controller.getVocabularyHistory());
         MenuHelper.initHelpMenu(this, menuBar);
 
 
@@ -273,7 +285,6 @@ public class View extends JFrame implements ActionListener
                         @Override
                         public void actionPerformed(ActionEvent e)
                         {
-                            //System.out.println("actionPerformed");
                             controller.addWord(finalWrd, e.getActionCommand().toString().trim());
                         }
                     });

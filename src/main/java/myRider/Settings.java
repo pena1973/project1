@@ -75,12 +75,12 @@ public class Settings extends JDialog
         map.put("userName", userNameTextField.getText());
         map.put("keyYandex", keyYandexTextField.getText());
         map.put("showTips", showTipsCheckBox.isSelected() ? "true" : "false");
-        map.put("repeatWords", repeatWordsCheckBox.isSelected() ? "true" : "false");
         map.put("fonts", fontsComboBox.getSelectedItem().toString());
         map.put("size", sizeComboBox.getSelectedItem().toString());
         map.put("bold", boldCheckBox.isSelected() ? "true" : "false");
         map.put("italic", italicCheckBox.isSelected() ? "true" : "false");
         controller.saveSettings(map);
+        controller.addTips();
         controller.setSettings();
         controller.initKey();
         dispose();
@@ -112,7 +112,6 @@ public class Settings extends JDialog
             dialog.userNameTextField.setText(map.get("userName"));
             dialog.keyYandexTextField.setText(map.get("keyYandex"));
             dialog.showTipsCheckBox.setSelected(map.get("showTips").equals("true"));
-            dialog.repeatWordsCheckBox.setSelected(map.get("repeatWords").equals("true"));
             dialog.fontsComboBox.setSelectedItem(map.get("fonts"));
             dialog.sizeComboBox.setSelectedItem(map.get("size"));
             dialog.boldCheckBox.setSelected(map.get("bold").equals("true"));

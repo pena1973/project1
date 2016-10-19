@@ -1,7 +1,7 @@
 package myRider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javarush.test.level20.lesson02.task05.Solution;
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -24,13 +24,12 @@ import org.jsoup.nodes.Element;
 import javax.swing.*;
 import javax.swing.text.*;
 
+import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Iterator;
 
 
 public class Controller
@@ -38,31 +37,42 @@ public class Controller
     private View view;
     private Settings settings;
     private String key;
+    private Model model;
 
-//    private DefaultStyledDocument document;
+ //    private DefaultStyledDocument document;
     private DefaultStyledDocument documentVocabulary;
-    private StyledDocument document;
+    private DefaultStyledDocument document;
 //    private StyledDocument documentVocabulary;
 
     private File currentFile;
     private File currentFileVocabulary;
 
     private File propertyFile = new File("C:\\Project1\\property.txt");
+    private File historyFile = new File("C:\\Project1\\history.txt");
+    private File historyVokabularyFile = new File("C:\\Project1\\historyVabulary.txt");
+
+    // хранение листа истории открытия файлов
+    private Set<String> historySet = new HashSet<>();
+    private Set<String> historyVokabularySet = new HashSet<>();
 
     // соединение
     private static HttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
     private static Header contentType = new BasicHeader("Content-Type", "application/x-www-form-urlencoded");
 
     //  общие
-    public Controller(View view)
+    public Controller(View view, Model model)
     {
         this.view = view;
+        this.model = model;
     }
 
     public static void main(String[] args)
     {
         View view = new View();
-        Controller controller = new Controller(view);
+        Model model = new Model();
+        Controller controller = new Controller(view, model);
+
+
         view.setController(controller);
         view.init();
         controller.init();
@@ -72,15 +82,13 @@ public class Controller
     public void init()
     {
         NewVocabulary();
-
     }
 
     public void initKey()
     {
-        Map<String,String> map = getSettings();
+        Map<String, String> map = getSettings();
         key = map.get("keyYandex");
     }
-
 
     public void exit()
     {
@@ -97,7 +105,7 @@ public class Controller
 
     public void saveSettings(Map<String, String> map)
     {
-    //    File file = new File("C:\\Project1\\property.txt");
+        //    File file = new File("C:\\Project1\\property.txt");
 
         try (PrintWriter out = new PrintWriter(propertyFile.getAbsoluteFile()))
         {
@@ -119,34 +127,37 @@ public class Controller
 
     }
 
-    public Map<String, String> getSettings(){
+    public Map<String, String> getSettings()
+    {
 
         Map<String, String> map = new HashMap<>();
 
-        try(BufferedReader reader = new BufferedReader (new FileReader(propertyFile)))
+        try (BufferedReader reader = new BufferedReader(new FileReader(propertyFile)))
         {
             String c;
-            while ((c = reader.readLine())!=null){
+            while ((c = reader.readLine()) != null)
+            {
                 String[] prop = c.split("=");
-                map.put(prop[0],prop.length >1?prop[1]:"");
+                map.put(prop[0], prop.length > 1 ? prop[1] : "");
             }
         }
-        catch(IOException e){
+        catch (IOException e)
+        {
 
-        ExceptionHandler.log(e);
+            ExceptionHandler.log(e);
         }
         return map;
     }
-    public void setSettings(){
 
+    public void setSettings()
+    {
         view.setSettings();
 
     }
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////
 
-    //  все методы текста
+    //  все методы текстового документа
     public void resetDocument()
     {
         StyledEditorKit htmlKit = new StyledEditorKit();
@@ -157,7 +168,6 @@ public class Controller
 
     public void openDocument()
     {
-
         JFileChooser jFileChooser = new JFileChooser();
         jFileChooser.setFileFilter(new MyFileFilter());
         int n = jFileChooser.showOpenDialog(view);
@@ -180,16 +190,55 @@ public class Controller
             {
                 ExceptionHandler.log(e);
             }
+            addTips();
+        }
 
+    }
+
+    public void openDocument(String pathFile)
+    {
+        if (pathFile == null)
+            openDocument();
+        else
+        {
+            currentFile = new File(pathFile);
+
+            if (currentFile.exists())
+            {
+                resetDocument();
+                view.setTitle(currentFile.getName());
+                StyledEditorKit htmlKit = new StyledEditorKit();
+
+                try (FileReader reader = new FileReader(currentFile))
+                {
+                    htmlKit.read(reader, document, 0);
+
+                }
+                catch (IOException e)
+                {
+                    ExceptionHandler.log(e);
+                }
+                catch (BadLocationException e)
+                {
+                    ExceptionHandler.log(e);
+                }
+                addTips();
+
+            } else
+            {
+
+                openDocument();
+            }
         }
     }
 
     public void closeDocument()
     {
+        SetHistory(currentFile);
         resetDocument();
     }
 
-    //public DefaultStyledDocument getDocument()
+
     public StyledDocument getDocument()
     {
         return document;
@@ -224,6 +273,7 @@ public class Controller
             try (FileReader reader = new FileReader(currentFileVocabulary))
             {
                 htmlKit.read(reader, documentVocabulary, 0);
+                model.addWords(documentVocabulary.getText(0, documentVocabulary.getLength()));
             }
             catch (IOException e)
             {
@@ -232,6 +282,44 @@ public class Controller
             catch (BadLocationException e)
             {
                 ExceptionHandler.log(e);
+            }
+            addTips();
+        }
+
+    }
+
+    public void openVocabulary(String pathFile)
+    {
+        if (pathFile == null)
+            openVocabulary();
+        else
+        {
+            currentFileVocabulary = new File(pathFile);
+
+            if (currentFileVocabulary.exists())
+            {
+                resetVocabulary();
+                view.setTitle(currentFileVocabulary.getName());
+                StyledEditorKit htmlKit = new StyledEditorKit();
+
+                try (FileReader reader = new FileReader(currentFileVocabulary))
+                {
+                    htmlKit.read(reader, documentVocabulary, 0);
+                    model.addWords(documentVocabulary.getText(0, documentVocabulary.getLength()));
+                }
+                catch (IOException e)
+                {
+                    ExceptionHandler.log(e);
+                }
+                catch (BadLocationException e)
+                {
+                    ExceptionHandler.log(e);
+                }
+                addTips();
+            } else
+            {
+
+                openVocabulary();
             }
         }
     }
@@ -245,6 +333,7 @@ public class Controller
             try (FileWriter writer = new FileWriter(new File(currentFileVocabulary.toString() + ".txt")))
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
+                SetVocabularyHistory(currentFileVocabulary);
             }
             catch (BadLocationException | IOException e)
             {
@@ -255,7 +344,6 @@ public class Controller
 
     public void saveVocabularuAs()
     {
-        String path = "vocabulary.txt";
 
         JFileChooser jFileChooser = new JFileChooser();
         MyFileFilter filter = new MyFileFilter();
@@ -268,6 +356,7 @@ public class Controller
             try (FileWriter writer = new FileWriter(new File(currentFileVocabulary.toString() + ".txt")))
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
+                SetVocabularyHistory(currentFileVocabulary);
             }
             catch (BadLocationException | IOException e)
             {
@@ -286,6 +375,167 @@ public class Controller
     ////////////////////////////////////////////////////////////////////////////////////////////
 
     //  служебные процедуры и функции
+    void SetHistory(File currentFile)
+    {
+
+        try (PrintWriter out = new PrintWriter(historyFile.getAbsoluteFile()))
+        {
+            if (!historyFile.exists())
+            {
+                historyFile.createNewFile();
+            }
+
+            historySet.add(currentFile.toString());
+
+            //Записываем лист в файл первые пять
+            Iterator iterator = historySet.iterator();
+            while (iterator.hasNext())
+            {
+                out.println(iterator.next().toString().trim());
+            }
+
+        }
+        catch (IOException e)
+        {
+            ExceptionHandler.log(e);
+        }
+
+    }
+
+    void SetVocabularyHistory(File currentVocabularyFile)
+    {
+
+        try (PrintWriter out = new PrintWriter(historyVokabularyFile.getAbsoluteFile()))
+        {
+            if (!historyVokabularyFile.exists())
+            {
+                historyVokabularyFile.createNewFile();
+            }
+
+            historyVokabularySet.add(currentVocabularyFile.toString());
+
+            //Записываем лист в файл первые пять
+            Iterator iterator = historyVokabularySet.iterator();
+            while (iterator.hasNext())
+            {
+                out.println(iterator.next().toString().trim());
+            }
+
+        }
+        catch (IOException e)
+        {
+            ExceptionHandler.log(e);
+        }
+
+    }
+
+    Set<String> getHistory()
+    {
+
+        if (!historyFile.exists()) return historySet;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(historyFile)))
+        {
+            String c;
+            while ((c = reader.readLine()) != null)
+            {
+                historySet.add(c);
+            }
+        }
+        catch (IOException e)
+        {
+
+            ExceptionHandler.log(e);
+        }
+        return historySet;
+    }
+
+    Set<String> getVocabularyHistory()
+    {
+        if (!historyVokabularyFile.exists()) return historyVokabularySet;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(historyVokabularyFile)))
+        {
+            String c;
+            while ((c = reader.readLine()) != null)
+            {
+                historyVokabularySet.add(c);
+            }
+        }
+        catch (IOException e)
+        {
+            ExceptionHandler.log(e);
+        }
+        return historyVokabularySet;
+    }
+
+    // Добавляю полсказки в текст
+    public void addTips()
+    {
+        StyleContext context = new StyleContext();
+        Style style = context.addStyle("test", null);
+        StyleConstants.setForeground(style, Color.BLUE);
+
+        Map<String, String> map = getSettings();
+        boolean showTips = map.get("showTips").equals("true") ? true : false;
+        int count = 0;
+        String word = "";
+
+        if (showTips)
+        {
+            try
+            {
+                while (count < document.getLength())
+                {
+
+                    String s = document.getText(count, 1);
+                    if (s.matches("\\S"))
+                    {
+                        word = word.concat(s);
+
+                    } else
+                    {
+                        String translation = model.getTranslate(word);
+                        if (translation !=null)
+                        document.replace(count, 0,  "{"+translation+"}", style);
+                        word = "";
+                    }
+                    count++;
+                }
+                view.updateVocabulary();
+            }
+
+            catch (BadLocationException e)
+            {
+                ExceptionHandler.log(e);
+            }
+        }
+        else
+        {
+            resetDocument();
+
+            StyledEditorKit htmlKit = new StyledEditorKit();
+
+            try (FileReader reader = new FileReader(currentFile))
+            {
+                htmlKit.read(reader, document, 0);
+            }
+            catch (IOException e)
+            {
+                ExceptionHandler.log(e);
+            }
+            catch (BadLocationException e)
+            {
+                ExceptionHandler.log(e);
+            }
+
+            view.updateTxt();
+
+        }
+    }
+
+    // обработка слова
+
     public ArrayList<String> getWords(String wrd, String direction)
     {
 // ключ доступа к яндекс trnsl.1.1.20160928T190600Z.7a199fa95d360255.bca499bd605822f36e9144bf0e334af8dfbb391e
@@ -327,25 +577,22 @@ public class Controller
 //            }
 
 
-
         String urlRequest = "https://translate.yandex.net/api/v1.5/tr.json/translate?"
 //                + "key=trnsl.1.1.20160928T190600Z.7a199fa95d360255.bca499bd605822f36e9144bf0e334af8dfbb391e"
-                + "key="+key
+                + "key=" + key
                 + "&text=" + wrd.trim()
                 + "&lang=" + direction.trim();
         String responseString = "";
         String translate = "";
         try
         {
-//            HttpClient httpClient = HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build(); // сделать его статиком
-//            Header contentType = new BasicHeader("Content-Type", "application/x-www-form-urlencoded");
             HttpPost httpPost = new HttpPost(urlRequest);
             httpPost.addHeader(contentType);
             HttpResponse client = httpClient.execute(httpPost);
 
             HttpEntity enty = client.getEntity();
             responseString = (EntityUtils.toString(enty, "UTF-8"));
-            //System.out.println(responseString);
+
             translate = getTranslateFromJSON(responseString);
         }
         catch (IOException e)
@@ -394,15 +641,17 @@ public class Controller
 
         try
         {
-            documentVocabulary.replace(documentVocabulary.getLength(), 0, translate, null);
-            view.updateVocabulary();
+            if (!model.isWordExist(translation))
+            {
+                documentVocabulary.replace(documentVocabulary.getLength(), 0, translate, null);
+                view.updateVocabulary();
+                model.addWord(translate);
+            }
         }
         catch (BadLocationException e)
         {
             ExceptionHandler.log(e);
         }
-        //documentVocabulary.getText(0,documentVocabulary.getLength())
-        //System.out.println(translation + " - " + wrd);
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
