@@ -607,7 +607,6 @@ public class Controller
 
 
         String urlRequest = "https://translate.yandex.net/api/v1.5/tr.json/translate?"
-//                + "key=trnsl.1.1.20160928T190600Z.7a199fa95d360255.bca499bd605822f36e9144bf0e334af8dfbb391e"
                 + "key=" + key
                 + "&text=" + wrd.trim()
                 + "&lang=" + direction.trim();
