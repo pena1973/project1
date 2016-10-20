@@ -45,7 +45,12 @@ class MenuHelper
         addMenuItem(vocabularyMenu, "Открыть словарь", view);
         addMenuItem(vocabularyMenu, "Сохранить словарь", view);
         addMenuItem(vocabularyMenu, "Сохранить словарь как...", view);
-        vocabularyMenu.addSeparator();
+
+        if (historyVocabularySet.size() > 0)
+        {
+            vocabularyMenu.addSeparator();
+        }
+
         Iterator iterator = historyVocabularySet.iterator();
 
         while (iterator.hasNext())
@@ -62,12 +67,17 @@ class MenuHelper
         menuBar.add(fileMenu);
         addMenuItem(fileMenu, "Открыть файл", view);
         addMenuItem(fileMenu, "Закрыть файл", view);
-        fileMenu.addSeparator();
+
+        if (historySet.size() > 0)
+        {
+            fileMenu.addSeparator();
+        }
 
         Iterator iterator = historySet.iterator();
+
         while (iterator.hasNext())
         {
-            addMenuItem(fileMenu, (String) iterator.next()+" ", view);
+            addMenuItem(fileMenu, (String) iterator.next() + " ", view);
         }
 
         fileMenu.addSeparator();

@@ -20,8 +20,8 @@ public class Settings extends JDialog
     private JComboBox fontsComboBox;
     private JCheckBox boldCheckBox;
     private JCheckBox italicCheckBox;
-    private JCheckBox repeatWordsCheckBox;
     private JComboBox sizeComboBox;
+    private JList list;
 
     private Controller controller;
 

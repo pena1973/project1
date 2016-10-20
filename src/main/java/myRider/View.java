@@ -137,8 +137,8 @@ public class View extends JFrame implements ActionListener
 
     public void showAbout()
     {
-        JOptionPane.showMessageDialog(textPane, "Программа Мой ридер - мой первый самостоятельный проект", "О программе", JOptionPane.INFORMATION_MESSAGE);
-
+        controller.showDialogAbout();
+     //   JOptionPane.showMessageDialog(textPane, "Программа Мой ридер. Автор Баринова Наталья. Отзывы сюда: pena@pisem.net  ", "О программе", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void showSettings()

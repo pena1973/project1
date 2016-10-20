@@ -22,7 +22,7 @@ public class Model
     }
 
     public String getTranslate(String wrd){
-
+        wrd = wrd.replace("\uFEFF","");
         return map.get(wrd.trim());
 
     }

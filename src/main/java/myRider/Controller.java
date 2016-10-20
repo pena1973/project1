@@ -36,10 +36,12 @@ public class Controller
 {
     private View view;
     private Settings settings;
+    private About about;
     private String key;
+    private String directory;
     private Model model;
 
- //    private DefaultStyledDocument document;
+    //    private DefaultStyledDocument document;
     private DefaultStyledDocument documentVocabulary;
     private DefaultStyledDocument document;
 //    private StyledDocument documentVocabulary;
@@ -47,9 +49,10 @@ public class Controller
     private File currentFile;
     private File currentFileVocabulary;
 
-    private File propertyFile = new File("C:\\Project1\\property.txt");
-    private File historyFile = new File("C:\\Project1\\history.txt");
-    private File historyVokabularyFile = new File("C:\\Project1\\historyVabulary.txt");
+    private File propertyFile = new File(System.getProperty("user.dir") + "\\property.txt");
+    private File historyFile = new File(System.getProperty("user.dir") + "\\history.txt");
+    private File historyVokabularyFile = new File(System.getProperty("user.dir") + "\\historyVabulary.txt");
+
 
     // хранение листа истории открытия файлов
     private Set<String> historySet = new HashSet<>();
@@ -77,6 +80,7 @@ public class Controller
         view.init();
         controller.init();
         controller.initKey();
+
     }
 
     public void init()
@@ -95,6 +99,12 @@ public class Controller
 
         System.exit(0);
         //Исходя из общепринятой практики и установленных стандартов код выхода равный 0 — сигнализирует об успешном выполнении задачи.
+    }
+
+    //  все методы about
+    public void showDialogAbout()
+    {
+        about.showDialog(this);
     }
 
     //  все методы настроек
@@ -238,7 +248,6 @@ public class Controller
         resetDocument();
     }
 
-
     public StyledDocument getDocument()
     {
         return document;
@@ -256,7 +265,6 @@ public class Controller
     public void NewVocabulary()
     {
         resetVocabulary();
-        //view.setTitle(currentFile.getName() + " - словарь");
         currentFileVocabulary = null;
     }
 
@@ -284,6 +292,7 @@ public class Controller
                 ExceptionHandler.log(e);
             }
             addTips();
+            SetVocabularyHistory(currentFileVocabulary);
         }
 
     }
@@ -299,7 +308,7 @@ public class Controller
             if (currentFileVocabulary.exists())
             {
                 resetVocabulary();
-                view.setTitle(currentFileVocabulary.getName());
+              //  view.setTitle(currentFileVocabulary.getName());
                 StyledEditorKit htmlKit = new StyledEditorKit();
 
                 try (FileReader reader = new FileReader(currentFileVocabulary))
@@ -316,10 +325,11 @@ public class Controller
                     ExceptionHandler.log(e);
                 }
                 addTips();
+                SetVocabularyHistory(currentFileVocabulary);
             } else
             {
-
                 openVocabulary();
+
             }
         }
     }
@@ -330,7 +340,14 @@ public class Controller
 
         else
         {
-            try (FileWriter writer = new FileWriter(new File(currentFileVocabulary.toString() + ".txt")))
+            String path = currentFileVocabulary.toString();
+
+            if (!path.substring(path.length() - 3).equals("txt"))
+            {
+                path = path + ".txt";
+            }
+
+            try (FileWriter writer = new FileWriter(new File(path)))
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
                 SetVocabularyHistory(currentFileVocabulary);
@@ -352,8 +369,15 @@ public class Controller
         if (n == JFileChooser.APPROVE_OPTION)
         {
             currentFileVocabulary = jFileChooser.getSelectedFile();
+            String path = currentFileVocabulary.toString();
 
-            try (FileWriter writer = new FileWriter(new File(currentFileVocabulary.toString() + ".txt")))
+            if (!path.substring(path.length() - 3).equals("txt"))
+            {
+                path = path + ".txt";
+            }
+
+            try (FileWriter writer = new FileWriter(new File(path)))
+
             {
                 new StyledEditorKit().write(writer, documentVocabulary, 0, documentVocabulary.getLength());
                 SetVocabularyHistory(currentFileVocabulary);
@@ -388,9 +412,11 @@ public class Controller
             historySet.add(currentFile.toString());
 
             //Записываем лист в файл первые пять
+            int count=5;
             Iterator iterator = historySet.iterator();
             while (iterator.hasNext())
             {
+                count--;
                 out.println(iterator.next().toString().trim());
             }
 
@@ -415,9 +441,11 @@ public class Controller
             historyVokabularySet.add(currentVocabularyFile.toString());
 
             //Записываем лист в файл первые пять
+            int count=5;
             Iterator iterator = historyVokabularySet.iterator();
-            while (iterator.hasNext())
+            while (iterator.hasNext()&count>0)
             {
+                count--;
                 out.println(iterator.next().toString().trim());
             }
 
@@ -491,26 +519,27 @@ public class Controller
                     String s = document.getText(count, 1);
                     if (s.matches("\\S"))
                     {
+
                         word = word.concat(s);
 
                     } else
                     {
+                        word = word.replaceAll("[\\.\\,\\(\\)]","");
                         String translation = model.getTranslate(word);
-                        if (translation !=null)
-                        document.replace(count, 0,  "{"+translation+"}", style);
+                        if (translation != null)
+                            document.replace(count, 0, "{" + translation + "}", style);
                         word = "";
                     }
                     count++;
                 }
-                view.updateVocabulary();
+                view.updateTxt();
             }
 
             catch (BadLocationException e)
             {
                 ExceptionHandler.log(e);
             }
-        }
-        else
+        } else
         {
             resetDocument();
 
@@ -646,6 +675,7 @@ public class Controller
                 documentVocabulary.replace(documentVocabulary.getLength(), 0, translate, null);
                 view.updateVocabulary();
                 model.addWord(translate);
+                addTips();
             }
         }
         catch (BadLocationException e)
